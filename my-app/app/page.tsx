@@ -1,29 +1,29 @@
-import { Suspense, use } from "react";
+import { use } from "react";
 
-function Users() {
-  const users = use(
-    fetch("https://jsonplaceholder.typicode.com/users").then((res) =>
-      res.json(),
-    ),
-  );
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
 
-  return (
-    <ul>
-      {users.map((u: any) => (
-        <li key={u.id}>{u.name}</li>
-      ))}
-    </ul>
-  );
+async function getUsers(): Promise<User[]> {
+  const res = await fetch("https://jsonplaceholder.typicode.com/users");
+  return res.json();
 }
 
 export default function Page() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>Users</h1>
+  const users = use(getUsers());
 
-      <Suspense fallback={<p>Loading...</p>}>
-        <Users />
-      </Suspense>
+  return (
+    <div>
+      <h1>Users</h1>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>
+            {user.name} - {user.email}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
